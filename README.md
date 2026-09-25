@@ -5,7 +5,7 @@
 ## Запуск
 
 ```bash
-cd conductor-trainer
+cd HSR---heartbeat-of-the-main-line
 npm install
 cp .env.example .env
 npm run dev
