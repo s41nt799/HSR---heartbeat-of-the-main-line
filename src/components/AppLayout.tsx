@@ -1,5 +1,6 @@
-import { NavLink, Outlet } from 'react-router-dom';
+import { NavLink, Outlet, useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
+import { LevelBadge } from './LevelBadge';
 
 const linkClass = ({ isActive }: { isActive: boolean }) =>
   `rounded-lg px-3 py-2 text-sm transition-colors ${
@@ -10,6 +11,12 @@ const linkClass = ({ isActive }: { isActive: boolean }) =>
 
 export function AppLayout() {
   const { logout, user } = useAuth();
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    logout();
+    navigate('/login', { replace: true });
+  };
 
   return (
     <div className="min-h-screen">
@@ -28,7 +35,10 @@ export function AppLayout() {
             <NavLink to="/leaderboard" className={linkClass}>
               Лидерборд
             </NavLink>
-            <button type="button" className="btn-ghost text-sm" onClick={logout}>
+            {user && (
+              <LevelBadge level={user.level} score={user.total_score} />
+            )}
+            <button type="button" className="btn-ghost text-sm" onClick={handleLogout}>
               Выйти
               {user?.display_name ? ` (${user.display_name})` : ''}
             </button>

@@ -54,6 +54,8 @@ export interface UserMe {
   email: string;
   display_name: string;
   total_score: number;
+  /** TODO: серверное значение; пока может отсутствовать */
+  level?: number;
 }
 
 export interface ScenarioItem {
@@ -178,6 +180,8 @@ export interface ProfileResponse {
     email: string;
     display_name: string;
     total_score: number;
+    /** TODO: серверное значение; пока может отсутствовать */
+    level?: number;
   };
   stats: {
     sessions_completed: number;

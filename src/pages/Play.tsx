@@ -1,19 +1,30 @@
-import { useEffect, useRef } from 'react';
-import { Link, useNavigate, useParams } from 'react-router-dom';
+import { useCallback, useEffect, useRef } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
 import { getErrorMessage } from '../api/client';
 import { EmptyState } from '../components/EmptyState';
 import { ErrorState } from '../components/ErrorState';
 import { LoadingState } from '../components/LoadingState';
 import { NodeView } from '../components/NodeView';
 import { StatBar } from '../components/StatBar';
+import { TimerBar } from '../components/TimerBar';
 import { useSession } from '../hooks/useSession';
-import { useToast } from '../store/toastStore';
+import { useTimer } from '../hooks/useTimer';
+import { useToast } from '../hooks/useToast';
+import type { ChoiceResponse, Effects } from '../types/api';
+import { effectsToastType, formatEffectsToast } from '../utils/effectsToast';
+
+function showEffects(show: (m: string, t?: 'success' | 'error' | 'info') => void, effects: Effects) {
+  const text = formatEffectsToast(effects);
+  if (text === 'Без изменений') return;
+  show(text, effectsToastType(effects));
+}
 
 export function PlayPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { show } = useToast();
   const redirectedRef = useRef(false);
+  const timeoutStartedRef = useRef(false);
 
   const {
     node,
@@ -22,29 +33,97 @@ export function PlayPage() {
     refetch,
     makeChoice,
     isChoosing,
+    triggerTimeout,
+    isTimingOut,
     finish,
     isFinishing,
   } = useSession(id);
 
+  // Сброс guard таймаута при смене узла
+  useEffect(() => {
+    timeoutStartedRef.current = false;
+  }, [node?.node_key]);
+
   useEffect(() => {
     if (!node || redirectedRef.current) return;
-    if (node.state === 'failed') {
+    if (node.state !== 'active') {
       redirectedRef.current = true;
       navigate(`/sessions/${id}/debrief`, { replace: true });
     }
   }, [node, id, navigate]);
 
-  const handleChoice = async (choiceKey: string) => {
-    if (!id || isChoosing) return;
+  const handleTimeout = useCallback(async () => {
+    if (!id || timeoutStartedRef.current || isTimingOut || isChoosing) return;
+    timeoutStartedRef.current = true;
     try {
-      const result = await makeChoice(choiceKey);
-      if (result.state === 'failed') {
-        show('Сессия провалена: одна из шкал обнулилась', 'error');
+      const result = await triggerTimeout();
+      show('Время вышло', 'error');
+      if (result.effects) {
+        showEffects(show, result.effects);
+      }
+      if (result.state === 'failed' || result.state !== 'active') {
         navigate(`/sessions/${id}/debrief`, { replace: true });
         return;
       }
-      if (!result.accepted) {
+      // Если сервер не применил timeout — разрешаем повтор
+      if (!result.timeout_applied) {
+        timeoutStartedRef.current = false;
+      }
+    } catch (err) {
+      timeoutStartedRef.current = false;
+      show(getErrorMessage(err, 'Не удалось применить таймаут'), 'error');
+      void refetch();
+    }
+  }, [id, isTimingOut, isChoosing, triggerTimeout, show, navigate, refetch]);
+
+  // Critical + deadline уже прошёл — сразу POST /timeout (не ждать тика таймера)
+  useEffect(() => {
+    if (!node || node.state !== 'active') return;
+    if (node.type !== 'critical' || !node.deadline) return;
+    const deadlineMs = Date.parse(node.deadline);
+    const serverNowMs = Date.parse(node.server_now);
+    if (Number.isNaN(deadlineMs) || Number.isNaN(serverNowMs)) return;
+    if (deadlineMs <= serverNowMs) {
+      void handleTimeout();
+    }
+  }, [node, handleTimeout]);
+
+  // timer_sec === null → таймер не рендерить
+  const showTimer =
+    node?.type === 'critical' &&
+    node.timer_sec != null &&
+    node.deadline != null &&
+    node.state === 'active';
+
+  const { remaining_sec, progress } = useTimer(
+    showTimer ? node!.deadline : null,
+    node?.server_now ?? new Date().toISOString(),
+    handleTimeout,
+  );
+
+  const handleChoice = async (choiceKey: string) => {
+    if (!id || isChoosing || isTimingOut) return;
+    if (remaining_sec !== null && remaining_sec <= 0) return;
+
+    try {
+      const result: ChoiceResponse = await makeChoice(choiceKey);
+
+      if (result.accepted) {
+        showEffects(show, result.effects);
+        if (result.speed_bonus > 0) {
+          show(`+${result.speed_bonus} за скорость`, 'success');
+        }
+      } else {
         show('Время вышло', 'error');
+        showEffects(show, result.effects);
+      }
+
+      if (result.state !== 'active') {
+        if (result.state === 'failed') {
+          show('Сессия провалена: одна из шкал обнулилась', 'error');
+        }
+        navigate(`/sessions/${id}/debrief`, { replace: true });
+        return;
       }
     } catch (err) {
       show(getErrorMessage(err, 'Не удалось отправить выбор'), 'error');
@@ -92,7 +171,10 @@ export function PlayPage() {
     return (
       <ErrorState
         message={getErrorMessage(error)}
-        onRetry={() => void refetch()}
+        onRetry={() => {
+          show('Повтор запроса…', 'info');
+          void refetch();
+        }}
       />
     );
   }
@@ -107,21 +189,13 @@ export function PlayPage() {
     );
   }
 
-  if (node.state === 'failed') {
-    return (
-      <div className="card space-y-4 text-center">
-        <h1 className="text-xl font-semibold text-rose-300">Провал</h1>
-        <p className="text-sm text-slate-400">
-          Одна из шкал достигла нуля. Разберите решения в дебрифе.
-        </p>
-        <Link to={`/sessions/${id}/debrief`} className="btn inline-flex">
-          Дебриф
-        </Link>
-      </div>
-    );
+  if (node.state !== 'active') {
+    return <LoadingState label="Переход к дебрифу…" />;
   }
 
-  const busy = isChoosing || isFinishing;
+  const busy = isChoosing || isFinishing || isTimingOut;
+  const timerExpired = remaining_sec !== null && remaining_sec <= 0;
+  const choicesDisabled = busy || node.state !== 'active' || timerExpired;
 
   return (
     <div className="space-y-6">
@@ -138,13 +212,14 @@ export function PlayPage() {
             </div>
           </div>
         </div>
+        {showTimer && <TimerBar remaining={remaining_sec} progress={progress} />}
       </div>
 
       <div className="card">
         <NodeView
           node={node}
           onChoice={handleChoice}
-          choicesDisabled={busy || node.state !== 'active'}
+          choicesDisabled={choicesDisabled}
           onFinish={handleFinish}
           finishDisabled={busy}
         />

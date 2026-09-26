@@ -5,8 +5,9 @@ import { getErrorMessage } from '../api/client';
 import { EmptyState } from '../components/EmptyState';
 import { ErrorState } from '../components/ErrorState';
 import { SkeletonCards } from '../components/LoadingState';
-import { useToast } from '../store/toastStore';
+import { useToast } from '../hooks/useToast';
 import { difficultyLabel } from '../utils/format';
+import { rememberSessionScenario } from '../utils/sessionScenario';
 
 export function ScenariosPage() {
   const navigate = useNavigate();
@@ -21,7 +22,8 @@ export function ScenariosPage() {
   const startMutation = useMutation({
     mutationFn: (scenarioId: string) =>
       sessionsApi.create({ scenario_id: scenarioId }),
-    onSuccess: (data) => {
+    onSuccess: (data, scenarioId) => {
+      rememberSessionScenario(data.session_id, scenarioId);
       navigate(`/sessions/${data.session_id}/play`);
     },
     onError: (err) => {

@@ -51,6 +51,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     setUnauthorizedHandler(() => {
       logout();
+      // Редирект на /login при 401 (вне React Router tree interceptor)
+      if (window.location.pathname !== '/login' && window.location.pathname !== '/register') {
+        window.location.assign('/login');
+      }
     });
     return () => setUnauthorizedHandler(null);
   }, [logout]);

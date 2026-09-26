@@ -36,6 +36,9 @@ export function useSession(sessionId: string | undefined) {
 
   const finishMutation = useMutation({
     mutationFn: () => sessionsApi.postFinish(sessionId!),
+    onSuccess: () => {
+      invalidateNode();
+    },
   });
 
   return {
