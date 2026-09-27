@@ -30,8 +30,3 @@
 - `401` — неавторизован, → logout + /login
 - `404` — не найдено
 - `5xx` — серверная ошибка, → toast + retry
-
-## Mock-данные
-Доступны фикстуры в `src/api/mock/fixtures.ts`:
-- `mockProfile` — профиль пользователя
-- `mockDebrief` — разбор сессии
