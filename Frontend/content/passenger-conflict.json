@@ -35,42 +35,42 @@
         {
           "choice_key": "speak_loudly",
           "text": "Громко сказать: 'Прекратите иначе вызову полицию'",
-          "effects": { "loyalty": -5, "safety": -5, "points": -5 },
+          "effects": { "loyalty": -10, "safety": -10, "points": -10 },
           "next_node_key": "speak_loudly_result",
           "is_visible": true
         },
         {
           "choice_key": "watch_only",
           "text": "Следить за ситуацией и не вмешиваться",
-          "effects": { "loyalty": -5, "safety": -5, "points": -5 },
+          "effects": { "loyalty": -10, "safety": -10, "points": -10 },
           "next_node_key": "watch_result",
           "is_visible": true
         },
         {
           "choice_key": "try_stop",
           "text": "Попытаться остановить ссору пассажиров",
-          "effects": { "loyalty": 10, "safety": 5, "points": 15 },
+          "effects": { "loyalty": 15, "safety": 10, "points": 20 },
           "next_node_key": "calm_speech",
           "is_visible": true
         },
         {
           "choice_key": "urgent_report",
           "text": "Срочно доложить машинисту о ухудшении ситуации",
-          "effects": { "loyalty": 5, "safety": 10, "points": 15 },
+          "effects": { "loyalty": 10, "safety": 15, "points": 20 },
           "next_node_key": "driver_3min",
           "is_visible": true
         },
         {
           "choice_key": "go_alone",
           "text": "Пойти разнимать в одиночку",
-          "effects": { "loyalty": 0, "safety": -10, "points": -10 },
+          "effects": { "loyalty": -5, "safety": -25, "points": -15 },
           "next_node_key": "got_hit_again",
           "is_visible": true
         },
         {
           "choice_key": "timeout",
           "text": "",
-          "effects": { "loyalty": -5, "safety": -10, "points": -15 },
+          "effects": { "loyalty": -10, "safety": -15, "points": -20 },
           "next_node_key": "watch_result",
           "is_visible": false
         }
@@ -85,14 +85,14 @@
         {
           "choice_key": "report_conflict",
           "text": "Сообщить машинисту о конфликтной ситуации",
-          "effects": { "loyalty": 0, "safety": 10, "points": 10 },
+          "effects": { "loyalty": 0, "safety": 15, "points": 15 },
           "next_node_key": "police_arrives",
           "is_visible": true
         },
         {
           "choice_key": "dont_report",
           "text": "Не докладывать машинисту, попытаться дальше успокоить пассажиров самостоятельно",
-          "effects": { "loyalty": -5, "safety": -10, "points": -10 },
+          "effects": { "loyalty": -15, "safety": -15, "points": -15 },
           "next_node_key": "dont_report_result",
           "is_visible": true
         }
@@ -143,7 +143,7 @@
         {
           "choice_key": "urgent_report_2",
           "text": "Срочно доложить машинисту о ухудшении ситуации",
-          "effects": { "loyalty": 5, "safety": 10, "points": 10 },
+          "effects": { "loyalty": 10, "safety": 15, "points": 15 },
           "next_node_key": "driver_3min",
           "is_visible": true
         }
@@ -165,14 +165,14 @@
         {
           "choice_key": "go_alone",
           "text": "Пойти разнимать в одиночку",
-          "effects": { "loyalty": 0, "safety": -10, "points": -10 },
+          "effects": { "loyalty": -5, "safety": -25, "points": -15 },
           "next_node_key": "got_hit_again",
           "is_visible": true
         },
         {
           "choice_key": "wait_arrival",
           "text": "Дождаться прибытия наряда на станцию",
-          "effects": { "loyalty": 0, "safety": 10, "points": 5 },
+          "effects": { "loyalty": 0, "safety": 15, "points": 10 },
           "next_node_key": "wait_arrival_result",
           "is_visible": true
         }
@@ -216,14 +216,14 @@
         {
           "choice_key": "separate_seats",
           "text": "Развести пассажиров по их местам",
-          "effects": { "loyalty": 5, "safety": 5, "points": 10 },
+          "effects": { "loyalty": 10, "safety": 10, "points": 15 },
           "next_node_key": "fight_again",
           "is_visible": true
         },
         {
           "choice_key": "separate_wagons",
           "text": "Развести пассажиров по разным вагонам",
-          "effects": { "loyalty": 10, "safety": 10, "points": 15 },
+          "effects": { "loyalty": 15, "safety": 15, "points": 20 },
           "next_node_key": "separated_result",
           "is_visible": true
         },
@@ -237,7 +237,7 @@
         {
           "choice_key": "timeout",
           "text": "",
-          "effects": { "loyalty": -5, "safety": -10, "points": -15 },
+          "effects": { "loyalty": -10, "safety": -15, "points": -20 },
           "next_node_key": "fight_again",
           "is_visible": false
         }
@@ -252,14 +252,14 @@
         {
           "choice_key": "report_decision",
           "text": "По решению докладываем машинисту. Машинист вызывает наряд на станцию",
-          "effects": { "loyalty": 10, "safety": 10, "points": 15 },
+          "effects": { "loyalty": 15, "safety": 15, "points": 20 },
           "next_node_key": "solved_but_danger",
           "is_visible": true
         },
         {
           "choice_key": "leave_unattended",
           "text": "Оставить их до станции без присмотра так как они уже успокоились",
-          "effects": { "loyalty": -10, "safety": -10, "points": -15 },
+          "effects": { "loyalty": -15, "safety": -20, "points": -15 },
           "next_node_key": "fight_again",
           "is_visible": true
         }
@@ -288,7 +288,7 @@
         {
           "choice_key": "timeout",
           "text": "",
-          "effects": { "loyalty": -5, "safety": -10, "points": -15 },
+          "effects": { "loyalty": -10, "safety": -15, "points": -20 },
           "next_node_key": "reprimand",
           "is_visible": false
         }
@@ -303,7 +303,7 @@
         {
           "choice_key": "arrived",
           "text": "Доехали до станции",
-          "effects": { "loyalty": 5, "safety": 10, "points": 15 },
+          "effects": { "loyalty": 10, "safety": 15, "points": 15 },
           "next_node_key": "arrived_removed",
           "is_visible": true
         }

@@ -20,21 +20,21 @@
         {
           "choice_key": "find_doctor",
           "text": "Искать врача по составу",
-          "effects": { "loyalty": 5, "safety": 5, "points": 10 },
+          "effects": { "loyalty": 10, "safety": 10, "points": 15 },
           "next_node_key": "doctor_found",
           "is_visible": true
         },
         {
           "choice_key": "call_medic",
           "text": "Сообщить машинисту, попросить вызвать скорую на платформу",
-          "effects": { "loyalty": 5, "safety": 5, "points": 5 },
+          "effects": { "loyalty": 5, "safety": 10, "points": 15 },
           "next_node_key": "ambulance_waiting",
           "is_visible": true
         },
         {
           "choice_key": "observe",
           "text": "Наблюдать за состоянием",
-          "effects": { "loyalty": -5, "safety": -5, "points": -5 },
+          "effects": { "loyalty": -10, "safety": -15, "points": -10 },
           "next_node_key": "watch_condition",
           "is_visible": true
         }
@@ -49,14 +49,14 @@
         {
           "choice_key": "after_pills_report",
           "text": "После осмотра и принятых таблеток пассажиру, доложить машинисту о состоянии",
-          "effects": { "loyalty": 5, "safety": 5, "points": 10 },
+          "effects": { "loyalty": 10, "safety": 10, "points": 15 },
           "next_node_key": "driver_reported_ok",
           "is_visible": true
         },
         {
           "choice_key": "dont_report",
           "text": "Не сообщать машинисту о состоянии",
-          "effects": { "loyalty": -5, "safety": -5, "points": -10 },
+          "effects": { "loyalty": -15, "safety": -20, "points": -15 },
           "next_node_key": "late_report",
           "is_visible": true
         }
@@ -85,21 +85,21 @@
         {
           "choice_key": "report_worse",
           "text": "Сообщить машинисту об ухудшении состояния пассажира. Обсудить, что делать дальше",
-          "effects": { "loyalty": 5, "safety": 10, "points": 10 },
+          "effects": { "loyalty": 10, "safety": 15, "points": 15 },
           "next_node_key": "driver_dispatch",
           "is_visible": true
         },
         {
           "choice_key": "dont_report_worse",
           "text": "Не докладывать машинисту",
-          "effects": { "loyalty": -5, "safety": -10, "points": -10 },
+          "effects": { "loyalty": -20, "safety": -25, "points": -20 },
           "next_node_key": "worse_continue",
           "is_visible": true
         },
         {
           "choice_key": "timeout",
           "text": "",
-          "effects": { "loyalty": -5, "safety": -10, "points": -15 },
+          "effects": { "loyalty": -10, "safety": -15, "points": -20 },
           "next_node_key": "worse_continue",
           "is_visible": false
         }
@@ -121,21 +121,21 @@
         {
           "choice_key": "report_late",
           "text": "Доложить машинисту",
-          "effects": { "loyalty": 1, "safety": 5, "points": 5 },
+          "effects": { "loyalty": 5, "safety": 5, "points": 5 },
           "next_node_key": "emergency_stop",
           "is_visible": true
         },
         {
           "choice_key": "dont_report_again",
           "text": "Не докладывать машинисту",
-          "effects": { "loyalty": -5, "safety": -10, "points": -10 },
+          "effects": { "loyalty": -20, "safety": -25, "points": -20 },
           "next_node_key": "lost_time",
           "is_visible": true
         },
         {
           "choice_key": "timeout",
           "text": "",
-          "effects": { "loyalty": -5, "safety": -10, "points": -15 },
+          "effects": { "loyalty": -10, "safety": -15, "points": -20 },
           "next_node_key": "lost_time",
           "is_visible": false
         }
@@ -164,21 +164,21 @@
         {
           "choice_key": "report_now",
           "text": "Сообщить машинисту",
-          "effects": { "loyalty": 5, "safety": 5, "points": 10 },
+          "effects": { "loyalty": 10, "safety": 10, "points": 15 },
           "next_node_key": "worse_continue",
           "is_visible": true
         },
         {
           "choice_key": "wait_more",
           "text": "Подождать еще",
-          "effects": { "loyalty": -5, "safety": -10, "points": -10 },
+          "effects": { "loyalty": -15, "safety": -20, "points": -15 },
           "next_node_key": "driver_stop_signal",
           "is_visible": true
         },
         {
           "choice_key": "timeout",
           "text": "",
-          "effects": { "loyalty": -5, "safety": -10, "points": -15 },
+          "effects": { "loyalty": -10, "safety": -15, "points": -20 },
           "next_node_key": "driver_stop_signal",
           "is_visible": false
         }
@@ -193,7 +193,7 @@
         {
           "choice_key": "arrived",
           "text": "Доехали до станции",
-          "effects": { "loyalty": 0, "safety": 1, "points": 5 },
+          "effects": { "loyalty": 0, "safety": 5, "points": 5 },
           "next_node_key": "critical_condition",
           "is_visible": true
         }
