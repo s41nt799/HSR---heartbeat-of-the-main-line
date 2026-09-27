@@ -3,10 +3,10 @@ import { useAuth } from '../hooks/useAuth';
 import { LoadingState } from './LoadingState';
 
 export function ProtectedRoute() {
-  const { isAuthenticated, isLoading, token } = useAuth();
+  const { isAuthenticated, isLoading } = useAuth();
   const location = useLocation();
 
-  if (!token || !isAuthenticated) {
+  if (!isAuthenticated) {
     return <Navigate to="/login" replace state={{ from: location }} />;
   }
 
