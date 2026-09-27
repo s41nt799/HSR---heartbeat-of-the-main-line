@@ -60,8 +60,8 @@ uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 
 ## Документация
 
-- [Архитектура](docs/ARCHITECTURE.md)
-- [Дорожная карта](docs/ROADMAP.md)
+- [Архитектура](ARCHITECTURE.md)
+- [Дорожная карта](ROADMAP.md)
 
 ## API
 
