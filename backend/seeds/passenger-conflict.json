@@ -1,0 +1,342 @@
+{
+  "scenario_id": "passenger-conflict",
+  "title": "Конфликт в вагоне-ресторане",
+  "description": "Двое пассажиров в состоянии алкогольного опьянения готовы начать драку. Проводник должен принять решение за секунды.",
+  "version": 1,
+  "difficulty": "hard",
+  "is_active": true,
+  "start_node_key": "start",
+  "recommendations": [
+    "Доклад машинисту — первый шаг при угрозе драки, не действуй в одиночку",
+    "Не оставляй успокоившихся пассажиров без присмотра до станции"
+  ],
+  "nodes": [
+    {
+      "node_key": "start",
+      "type": "start",
+      "text": "Описание ситуации для проводника: В вагоне-ресторане двое пассажиров в стадии сильного алкогольного опьянения начали на грани ссоры. Один схватил со стола бутылку. До драки ~ 5 секунды. Вам надо принять решение что делать дальше",
+      "timer_sec": null,
+      "choices": [
+        {
+          "choice_key": "report_driver",
+          "text": "Доложить о конфликте машинисту",
+          "effects": { "loyalty": 0, "safety": 10, "points": 15 },
+          "next_node_key": "report_driver",
+          "is_visible": true
+        }
+      ]
+    },
+    {
+      "node_key": "report_driver",
+      "type": "critical",
+      "text": "Ты докладываешь машинисту о конфликте. Машинист отвечает: 'Принял. Вызываю наряд к станции через 12 минут. Следи за ситуацией. Если начнется драка доложи.'",
+      "timer_sec": 20,
+      "choices": [
+        {
+          "choice_key": "speak_loudly",
+          "text": "Громко сказать: 'Прекратите иначе вызову полицию'",
+          "effects": { "loyalty": -5, "safety": -5, "points": -5 },
+          "next_node_key": "speak_loudly_result",
+          "is_visible": true
+        },
+        {
+          "choice_key": "watch_only",
+          "text": "Следить за ситуацией и не вмешиваться",
+          "effects": { "loyalty": -5, "safety": -5, "points": -5 },
+          "next_node_key": "watch_result",
+          "is_visible": true
+        },
+        {
+          "choice_key": "try_stop",
+          "text": "Попытаться остановить ссору пассажиров",
+          "effects": { "loyalty": 10, "safety": 5, "points": 15 },
+          "next_node_key": "calm_speech",
+          "is_visible": true
+        },
+        {
+          "choice_key": "urgent_report",
+          "text": "Срочно доложить машинисту о ухудшении ситуации",
+          "effects": { "loyalty": 5, "safety": 10, "points": 15 },
+          "next_node_key": "driver_3min",
+          "is_visible": true
+        },
+        {
+          "choice_key": "go_alone",
+          "text": "Пойти разнимать в одиночку",
+          "effects": { "loyalty": 0, "safety": -10, "points": -10 },
+          "next_node_key": "got_hit_again",
+          "is_visible": true
+        },
+        {
+          "choice_key": "timeout",
+          "text": "",
+          "effects": { "loyalty": -5, "safety": -10, "points": -15 },
+          "next_node_key": "watch_result",
+          "is_visible": false
+        }
+      ]
+    },
+    {
+      "node_key": "speak_loudly_result",
+      "type": "dialogue",
+      "text": "Ты громко говоришь: 'Прекратите иначе вызову полицию'. Оба пассажиры не реагируют на твои слова.",
+      "timer_sec": null,
+      "choices": [
+        {
+          "choice_key": "report_conflict",
+          "text": "Сообщить машинисту о конфликтной ситуации",
+          "effects": { "loyalty": 0, "safety": 10, "points": 10 },
+          "next_node_key": "police_arrives",
+          "is_visible": true
+        },
+        {
+          "choice_key": "dont_report",
+          "text": "Не докладывать машинисту, попытаться дальше успокоить пассажиров самостоятельно",
+          "effects": { "loyalty": -5, "safety": -10, "points": -10 },
+          "next_node_key": "dont_report_result",
+          "is_visible": true
+        }
+      ]
+    },
+    {
+      "node_key": "police_arrives",
+      "type": "ending_success",
+      "text": "Машинист вызывает наряд на станцию. Ты дальше не вмешиваешься в ситуацию и на станции пассажиров забирают.",
+      "timer_sec": null,
+      "choices": []
+    },
+    {
+      "node_key": "dont_report_result",
+      "type": "dialogue",
+      "text": "Ты не сообщаешь машинисту. Пассажиры начинают драться, ты пытаешься их развить и получаешь удары в этой драке.",
+      "timer_sec": null,
+      "choices": [
+        {
+          "choice_key": "report_late",
+          "text": "Доложить машинисту",
+          "effects": { "loyalty": 0, "safety": 5, "points": 5 },
+          "next_node_key": "reprimand",
+          "is_visible": true
+        },
+        {
+          "choice_key": "ask_help",
+          "text": "Попросить помощи у пассажиров развить драку",
+          "effects": { "loyalty": 5, "safety": -5, "points": 5 },
+          "next_node_key": "reprimand",
+          "is_visible": true
+        }
+      ]
+    },
+    {
+      "node_key": "reprimand",
+      "type": "ending_fail",
+      "text": "Ты не сообщил машинисту о конфликтной ситуации и получил выговор за это.",
+      "timer_sec": null,
+      "choices": []
+    },
+    {
+      "node_key": "watch_result",
+      "type": "dialogue",
+      "text": "Ты следишь за ситуацией со стороны. Конфликт не сходит на нет, а пассажиры начинают драку.",
+      "timer_sec": null,
+      "choices": [
+        {
+          "choice_key": "urgent_report_2",
+          "text": "Срочно доложить машинисту о ухудшении ситуации",
+          "effects": { "loyalty": 5, "safety": 10, "points": 10 },
+          "next_node_key": "driver_3min",
+          "is_visible": true
+        }
+      ]
+    },
+    {
+      "node_key": "calm_speech",
+      "type": "ending_success",
+      "text": "Ты подходишь к пассажирам и спокойно говоришь: 'Полиция встретит вас на следующей станции. Не стоит продолжать конфликт дальше, это только ухудшит ситуацию'. Это успокаивает их и конфликт заканчивается.",
+      "timer_sec": null,
+      "choices": []
+    },
+    {
+      "node_key": "driver_3min",
+      "type": "dialogue",
+      "text": "Машинист: 'Принял до станции осталось 3 минуты. Постарайся, чтобы другие пассажиры не пострадали'.",
+      "timer_sec": null,
+      "choices": [
+        {
+          "choice_key": "go_alone",
+          "text": "Пойти разнимать в одиночку",
+          "effects": { "loyalty": 0, "safety": -10, "points": -10 },
+          "next_node_key": "got_hit_again",
+          "is_visible": true
+        },
+        {
+          "choice_key": "wait_arrival",
+          "text": "Дождаться прибытия наряда на станцию",
+          "effects": { "loyalty": 0, "safety": 10, "points": 5 },
+          "next_node_key": "wait_arrival_result",
+          "is_visible": true
+        }
+      ]
+    },
+    {
+      "node_key": "got_hit_again",
+      "type": "ending_fail",
+      "text": "Ты бросаешься разнимать. Тебе тоже прилетает от пассажиров которые сильно разбушевались.",
+      "timer_sec": null,
+      "choices": []
+    },
+    {
+      "node_key": "wait_arrival_result",
+      "type": "ending_success",
+      "text": "Ты не вмешиваешься до станции. Наряд забирает дебоширов, никто из пассажиров не пострадал.",
+      "timer_sec": null,
+      "choices": []
+    },
+    {
+      "node_key": "wait_result",
+      "type": "dialogue",
+      "text": "Ты ждёшь, надеясь, что конфликт остановится. Но пассажиры продолжают наращивать напряжение.",
+      "timer_sec": null,
+      "choices": [
+        {
+          "choice_key": "stand_between",
+          "text": "Встать между пассажирами, попробовав так остановить дальнейшие споры",
+          "effects": { "loyalty": 5, "safety": -10, "points": 5 },
+          "next_node_key": "get_hit_bottle",
+          "is_visible": true
+        }
+      ]
+    },
+    {
+      "node_key": "get_hit_bottle",
+      "type": "critical",
+      "text": "Ты встаешь между пассажирами. Один замахивается на тебя бутылкой. Ты получаешь удар. Пассажиры постепенно успокаиваются.",
+      "timer_sec": 15,
+      "choices": [
+        {
+          "choice_key": "separate_seats",
+          "text": "Развести пассажиров по их местам",
+          "effects": { "loyalty": 5, "safety": 5, "points": 10 },
+          "next_node_key": "fight_again",
+          "is_visible": true
+        },
+        {
+          "choice_key": "separate_wagons",
+          "text": "Развести пассажиров по разным вагонам",
+          "effects": { "loyalty": 10, "safety": 10, "points": 15 },
+          "next_node_key": "separated_result",
+          "is_visible": true
+        },
+        {
+          "choice_key": "remove_both",
+          "text": "Снять с поезда обоих",
+          "effects": { "loyalty": -5, "safety": 10, "points": 5 },
+          "next_node_key": "report_after_decision",
+          "is_visible": true
+        },
+        {
+          "choice_key": "timeout",
+          "text": "",
+          "effects": { "loyalty": -5, "safety": -10, "points": -15 },
+          "next_node_key": "fight_again",
+          "is_visible": false
+        }
+      ]
+    },
+    {
+      "node_key": "separated_result",
+      "type": "dialogue",
+      "text": "Ты разводишь пассажиров по разным вагонам.",
+      "timer_sec": null,
+      "choices": [
+        {
+          "choice_key": "report_decision",
+          "text": "По решению докладываем машинисту. Машинист вызывает наряд на станцию",
+          "effects": { "loyalty": 10, "safety": 10, "points": 15 },
+          "next_node_key": "solved_but_danger",
+          "is_visible": true
+        },
+        {
+          "choice_key": "leave_unattended",
+          "text": "Оставить их до станции без присмотра так как они уже успокоились",
+          "effects": { "loyalty": -10, "safety": -10, "points": -15 },
+          "next_node_key": "fight_again",
+          "is_visible": true
+        }
+      ]
+    },
+    {
+      "node_key": "solved_but_danger",
+      "type": "ending_success",
+      "text": "Ситуация решена и закончилась хорошо. Но ты мог подвергнуться опасности, когда встал между пассажирами. В таких ситуациях",
+      "timer_sec": null,
+      "choices": []
+    },
+    {
+      "node_key": "fight_again",
+      "type": "critical",
+      "text": "Пассажиры снова вступают в словесную перепалку. И на этот раз все доходит до драки. В вагоне начинается хаос.",
+      "timer_sec": 10,
+      "choices": [
+        {
+          "choice_key": "observe_only",
+          "text": "Сейчас вы можете только наблюдать за происходящим и сообщить машинисту о ситуации, чтобы был вызван наряд полиции",
+          "effects": { "loyalty": 5, "safety": 10, "points": 10 },
+          "next_node_key": "escort_out",
+          "is_visible": true
+        },
+        {
+          "choice_key": "timeout",
+          "text": "",
+          "effects": { "loyalty": -5, "safety": -10, "points": -15 },
+          "next_node_key": "reprimand",
+          "is_visible": false
+        }
+      ]
+    },
+    {
+      "node_key": "escort_out",
+      "type": "dialogue",
+      "text": "Сопроводить до выхода и передать народу.",
+      "timer_sec": null,
+      "choices": [
+        {
+          "choice_key": "arrived",
+          "text": "Доехали до станции",
+          "effects": { "loyalty": 5, "safety": 10, "points": 15 },
+          "next_node_key": "arrived_removed",
+          "is_visible": true
+        }
+      ]
+    },
+    {
+      "node_key": "arrived_removed",
+      "type": "ending_success",
+      "text": "Вы доехали до станции и буйных пассажиров сняли.",
+      "timer_sec": null,
+      "choices": []
+    },
+    {
+      "node_key": "report_after_decision",
+      "type": "ending_success",
+      "text": "По решению докладываем машинисту. Машинист вызывает наряд на станцию.",
+      "timer_sec": null,
+      "choices": []
+    },
+    {
+      "node_key": "correct_but_danger",
+      "type": "ending_success",
+      "text": "Вы сделали правильные действия. Но ваша жизнь была подвергнута опасности, вы могли пострадать во время драки.",
+      "timer_sec": null,
+      "choices": []
+    }
+  ],
+  "debrief_hints": {
+    "start": "При угрозе драки — сначала доклад машинисту, потом действия",
+    "report_driver": "Дожидайся инструкций машиниста, не действуй в одиночку. Срочный доклад при ухудшении — правильный ход",
+    "speak_loudly_result": "Крик не работает на пьяных пассажиров — переходи к докладу",
+    "dont_report_result": "Без доклада машинисту ты теряешь поддержку и получаешь выговор",
+    "get_hit_bottle": "Вставать между пассажирами — риск для жизни. Лучше развести по разным вагонам и доложить",
+    "fight_again": "Драка началась — единственное верное действие: доклад машинисту и ожидание наряда"
+  }
+}

@@ -1,0 +1,8 @@
+[
+  { "email": "demo@vsm.ru", "password": "demo1234", "display_name": "Демо Проводник", "role": "conductor", "total_score": 1240 },
+  { "email": "ivanov@vsm.ru", "password": "demo1234", "display_name": "Иван П.", "role": "conductor", "total_score": 2400 },
+  { "email": "popova@vsm.ru", "password": "demo1234", "display_name": "Елена П.", "role": "conductor", "total_score": 1850 },
+  { "email": "smirnova@vsm.ru", "password": "demo1234", "display_name": "Мария С.", "role": "conductor", "total_score": 980 },
+  { "email": "kuznetsov@vsm.ru", "password": "demo1234", "display_name": "Алексей К.", "role": "conductor", "total_score": 750 },
+  { "email": "volkov@vsm.ru", "password": "demo1234", "display_name": "Дмитрий В.", "role": "conductor", "total_score": 620 }
+]

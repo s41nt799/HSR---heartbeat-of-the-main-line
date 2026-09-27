@@ -1,0 +1,217 @@
+{
+  "scenario_id": "medical-incident",
+  "title": "Медицинский инцидент в пути",
+  "description": "Пассажиру стало плохо с сердцем. До следующей станции 20 минут — нужно принять решение.",
+  "version": 1,
+  "difficulty": "hard",
+  "is_active": true,
+  "start_node_key": "start",
+  "recommendations": [
+    "При боли в груди — сразу искать врача по составу и сообщать машинисту",
+    "Поздний доклад машинисту может стоить пассажиру жизни"
+  ],
+  "nodes": [
+    {
+      "node_key": "start",
+      "type": "start",
+      "text": "Описание ситуации для проводника: В пути мужчине стало плохо. У него болит грудная клетка. Он говорит что после ужина был он и вскоре пройдет. До прибытия поезда на следующую станцию 20 минут. Вам надо принять решение что делать дальше",
+      "timer_sec": null,
+      "choices": [
+        {
+          "choice_key": "find_doctor",
+          "text": "Искать врача по составу",
+          "effects": { "loyalty": 5, "safety": 5, "points": 10 },
+          "next_node_key": "doctor_found",
+          "is_visible": true
+        },
+        {
+          "choice_key": "call_medic",
+          "text": "Сообщить машинисту, попросить вызвать скорую на платформу",
+          "effects": { "loyalty": 5, "safety": 5, "points": 5 },
+          "next_node_key": "ambulance_waiting",
+          "is_visible": true
+        },
+        {
+          "choice_key": "observe",
+          "text": "Наблюдать за состоянием",
+          "effects": { "loyalty": -5, "safety": -5, "points": -5 },
+          "next_node_key": "watch_condition",
+          "is_visible": true
+        }
+      ]
+    },
+    {
+      "node_key": "doctor_found",
+      "type": "dialogue",
+      "text": "Врач нашелся, был проведен осмотр. У пассажира оказалась с собой таблетки для сердца.",
+      "timer_sec": null,
+      "choices": [
+        {
+          "choice_key": "after_pills_report",
+          "text": "После осмотра и принятых таблеток пассажиру, доложить машинисту о состоянии",
+          "effects": { "loyalty": 5, "safety": 5, "points": 10 },
+          "next_node_key": "driver_reported_ok",
+          "is_visible": true
+        },
+        {
+          "choice_key": "dont_report",
+          "text": "Не сообщать машинисту о состоянии",
+          "effects": { "loyalty": -5, "safety": -5, "points": -10 },
+          "next_node_key": "late_report",
+          "is_visible": true
+        }
+      ]
+    },
+    {
+      "node_key": "driver_reported_ok",
+      "type": "ending_success",
+      "text": "Машинист доложил диспетчеру и скорая ждет на станции.",
+      "timer_sec": null,
+      "choices": []
+    },
+    {
+      "node_key": "late_report",
+      "type": "ending_fail",
+      "text": "Поздний доклад может обернуться ухудшением состояния для пассажира.",
+      "timer_sec": null,
+      "choices": []
+    },
+    {
+      "node_key": "ambulance_waiting",
+      "type": "critical",
+      "text": "Скорая ждет на платформе. Но в пути мужчине стало хуже. До станции где будут ждать медики осталось 15 минут.",
+      "timer_sec": 15,
+      "choices": [
+        {
+          "choice_key": "report_worse",
+          "text": "Сообщить машинисту об ухудшении состояния пассажира. Обсудить, что делать дальше",
+          "effects": { "loyalty": 5, "safety": 10, "points": 10 },
+          "next_node_key": "driver_dispatch",
+          "is_visible": true
+        },
+        {
+          "choice_key": "dont_report_worse",
+          "text": "Не докладывать машинисту",
+          "effects": { "loyalty": -5, "safety": -10, "points": -10 },
+          "next_node_key": "worse_continue",
+          "is_visible": true
+        },
+        {
+          "choice_key": "timeout",
+          "text": "",
+          "effects": { "loyalty": -5, "safety": -10, "points": -15 },
+          "next_node_key": "worse_continue",
+          "is_visible": false
+        }
+      ]
+    },
+    {
+      "node_key": "driver_dispatch",
+      "type": "ending_success",
+      "text": "Ответ машиниста: 'Принял. Докладываю диспетчеру.' После разговора с диспетчером: 'Диспетчер вызвал скорую к перегону. Остановимся через 5 минут тут'.",
+      "timer_sec": null,
+      "choices": []
+    },
+    {
+      "node_key": "worse_continue",
+      "type": "critical",
+      "text": "Ты не докладываешь машинисту. Поезд едет дальше, а пассажиру становится еще хуже.",
+      "timer_sec": 10,
+      "choices": [
+        {
+          "choice_key": "report_late",
+          "text": "Доложить машинисту",
+          "effects": { "loyalty": 1, "safety": 5, "points": 5 },
+          "next_node_key": "emergency_stop",
+          "is_visible": true
+        },
+        {
+          "choice_key": "dont_report_again",
+          "text": "Не докладывать машинисту",
+          "effects": { "loyalty": -5, "safety": -10, "points": -10 },
+          "next_node_key": "lost_time",
+          "is_visible": true
+        },
+        {
+          "choice_key": "timeout",
+          "text": "",
+          "effects": { "loyalty": -5, "safety": -10, "points": -15 },
+          "next_node_key": "lost_time",
+          "is_visible": false
+        }
+      ]
+    },
+    {
+      "node_key": "emergency_stop",
+      "type": "ending_fail",
+      "text": "Машинист экстренно связывается с диспетчером и делает срочную остановку. Пассажир спасен, но теперь сдаем выговор за несвоевременный доклад.",
+      "timer_sec": null,
+      "choices": []
+    },
+    {
+      "node_key": "lost_time",
+      "type": "ending_fail",
+      "text": "Ты не сообщил машинисту о состоянии пассажира. Время которое можно было использовать на помощь пассажиру было потеряно.",
+      "timer_sec": null,
+      "choices": []
+    },
+    {
+      "node_key": "watch_condition",
+      "type": "critical",
+      "text": "Пассажиру стало хуже.",
+      "timer_sec": 20,
+      "choices": [
+        {
+          "choice_key": "report_now",
+          "text": "Сообщить машинисту",
+          "effects": { "loyalty": 5, "safety": 5, "points": 10 },
+          "next_node_key": "worse_continue",
+          "is_visible": true
+        },
+        {
+          "choice_key": "wait_more",
+          "text": "Подождать еще",
+          "effects": { "loyalty": -5, "safety": -10, "points": -10 },
+          "next_node_key": "driver_stop_signal",
+          "is_visible": true
+        },
+        {
+          "choice_key": "timeout",
+          "text": "",
+          "effects": { "loyalty": -5, "safety": -10, "points": -15 },
+          "next_node_key": "driver_stop_signal",
+          "is_visible": false
+        }
+      ]
+    },
+    {
+      "node_key": "driver_stop_signal",
+      "type": "dialogue",
+      "text": "Машинист связывается с диспетчером и получает указания остановиться на перегоне.",
+      "timer_sec": null,
+      "choices": [
+        {
+          "choice_key": "arrived",
+          "text": "Доехали до станции",
+          "effects": { "loyalty": 0, "safety": 1, "points": 5 },
+          "next_node_key": "critical_condition",
+          "is_visible": true
+        }
+      ]
+    },
+    {
+      "node_key": "critical_condition",
+      "type": "ending_fail",
+      "text": "Вы доехали до станции, но пассажир оказался в критическом состоянии. Ваше решение оказалось неверным, и жизнь пассажира находится в опасности.",
+      "timer_sec": null,
+      "choices": []
+    }
+  ],
+  "debrief_hints": {
+    "start": "Боль в груди — всегда срочно: ищи врача и докладывай машинисту",
+    "doctor_found": "После осмотра врача всё равно нужно доложить машинисту — он обязан знать о состоянии",
+    "ambulance_waiting": "При ухудшении — немедленный доклад машинисту для экстренной остановки",
+    "worse_continue": "Поздний доклад ведёт к выговору и риску для пассажира",
+    "watch_condition": "Наблюдение без доклада — потеря времени. Докладывай сразу при ухудшении"
+  }
+}

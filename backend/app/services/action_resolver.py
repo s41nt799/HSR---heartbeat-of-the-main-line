@@ -59,7 +59,7 @@ async def apply_choice(db: AsyncSession, session_id: uuid.UUID, user_id: uuid.UU
     effects = choice.effects or {}
     loyalty_delta = effects.get('loyalty', 0)
     safety_delta = effects.get('safety', 0)
-    score_delta = effects.get('score', 0)
+    score_delta = effects.get('points', effects.get('score', 0))
 
     session.loyalty = clamp(session.loyalty + loyalty_delta, 0, 100)
     session.safety = clamp(session.safety + safety_delta, 0, 100)
@@ -199,12 +199,21 @@ async def apply_timeout(db: AsyncSession, session_id: uuid.UUID, user_id: uuid.U
     if current_node is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='Current node not found')
 
-    loyalty_delta = TIMEOUT_LOYALTY_DELTA
-    safety_delta = TIMEOUT_SAFETY_DELTA
-    score_delta = 0
+    timeout_choice = (await db.execute(select(Choice).where(Choice.node_id == current_node.id, Choice.choice_key == 'timeout'))).scalar_one_or_none()
+
+    if timeout_choice is not None:
+        te = timeout_choice.effects or {}
+        loyalty_delta = te.get('loyalty', TIMEOUT_LOYALTY_DELTA)
+        safety_delta = te.get('safety', TIMEOUT_SAFETY_DELTA)
+        score_delta = te.get('points', 0)
+    else:
+        loyalty_delta = TIMEOUT_LOYALTY_DELTA
+        safety_delta = TIMEOUT_SAFETY_DELTA
+        score_delta = 0
 
     session.loyalty = clamp(session.loyalty + loyalty_delta, 0, 100)
     session.safety = clamp(session.safety + safety_delta, 0, 100)
+    session.score = max(0, session.score + score_delta)
 
     timer_left_sec = 0
 
@@ -214,7 +223,7 @@ async def apply_timeout(db: AsyncSession, session_id: uuid.UUID, user_id: uuid.U
         node_key=session.current_node_key,
         choice_id=None,
         choice_key=None,
-        effects={'loyalty': loyalty_delta, 'safety': safety_delta},
+        effects={'loyalty': loyalty_delta, 'safety': safety_delta, 'points': score_delta},
         competency_effects=[],
         loyalty_after=session.loyalty,
         safety_after=session.safety,
@@ -223,10 +232,6 @@ async def apply_timeout(db: AsyncSession, session_id: uuid.UUID, user_id: uuid.U
         timer_left_sec=timer_left_sec,
     )
     db.add(session_event)
-
-    timeout_choice = (
-        await db.execute(select(Choice).where(Choice.node_id == current_node.id,Choice.choice_key == 'timeout'))
-    ).scalar_one_or_none()
 
     if timeout_choice is not None:
         next_node_key = timeout_choice.next_node_key

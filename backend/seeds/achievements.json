@@ -1,0 +1,12 @@
+[
+  { "code": "first_shift", "title": "Первая смена", "description": "Завершить любую сессию со статусом completed", "condition_code": "complete_any", "icon": "🚀", "sort_order": 1 },
+  { "code": "no_panic", "title": "Без паники", "description": "Завершить сессию без таймаутов", "condition_code": "no_timeout", "icon": "🧘", "sort_order": 2 },
+  { "code": "empathy_pro", "title": "Эмпатия профи", "description": "Финальная лояльность ≥ 90", "condition_code": "loyalty_90", "icon": "❤️", "sort_order": 3 },
+  { "code": "safety_first", "title": "Безопасность прежде всего", "description": "Финальная безопасность ≥ 95", "condition_code": "safety_95", "icon": "🛡️", "sort_order": 4 },
+  { "code": "fast_hand", "title": "Быстрая реакция", "description": "3 таймерных выбора с остатком ≥ 70%", "condition_code": "fast_3", "icon": "⚡", "sort_order": 5 },
+  { "code": "conflict_solver", "title": "Мастер конфликтов", "description": "Конфликт пассажира с лояльностью ≥ 85", "condition_code": "conflict_85", "icon": "🤝", "sort_order": 6 },
+  { "code": "crisis_master", "title": "Медик-проводник", "description": "Медицинский инцидент: безопасность ≥ 80, лояльность ≥ 60", "condition_code": "medical_80_60", "icon": "🩺", "sort_order": 7 },
+  { "code": "comeback", "title": "Возвращение в строй", "description": "Завершить сессию после падения любой шкалы ≤ 20", "condition_code": "comeback", "icon": "🔥", "sort_order": 8 },
+  { "code": "top_10", "title": "Входит в топ-10", "description": "Попасть в первые 10 всероссийского рейтинга", "condition_code": "top10", "icon": "🏆", "sort_order": 9 },
+  { "code": "stable_shift", "title": "Стабильная смена", "description": "3 успешные сессии за календарный день (UTC)", "condition_code": "stable_3", "icon": "📅", "sort_order": 10 }
+]
