@@ -8,9 +8,7 @@ import { EmptyState } from '../components/EmptyState';
 import { ErrorState } from '../components/ErrorState';
 import { EventRow } from '../components/EventRow';
 import { LoadingState } from '../components/LoadingState';
-import { ScoreBreakdown } from '../components/ScoreBreakdown';
 import { useToast } from '../hooks/useToast';
-import type { SessionState } from '../types/api';
 import { sessionStateClass, sessionStateLabel } from '../utils/format';
 import {
   getSessionScenario,
@@ -50,9 +48,9 @@ export function DebriefPage() {
 
   const replayMutation = useMutation({
     mutationFn: (scenarioId: string) =>
-      sessionsApi.create({ scenario_id: scenarioId }),
-    onSuccess: (data, scenarioId) => {
-      rememberSessionScenario(data.session_id, scenarioId);
+      sessionsApi.create(scenarioId),
+    onSuccess: (data) => {
+      rememberSessionScenario(data.session_id, data.scenario_id);
       navigate(`/sessions/${data.session_id}/play`);
     },
     onError: (err) => {
@@ -110,16 +108,16 @@ export function DebriefPage() {
   }
 
   const {
-    final,
-    score_breakdown,
+    state,
+    final_score,
+    loyalty,
+    safety,
+    duration_sec,
     events,
-    critical_decisions,
-    mistakes,
-    unlocked_achievements,
+    competency_progress,
+    achievements_unlocked,
     recommendations,
   } = data;
-  const state = final.state as SessionState;
-  // TODO: scenario_id из DebriefResponse, когда backend добавит
   const scenarioId = getSessionScenario(id);
 
   const visibleEvents = showAllEvents ? events : events.slice(0, EVENTS_PREVIEW);
@@ -165,93 +163,31 @@ export function DebriefPage() {
             value={sessionStateLabel(state)}
             accent={sessionStateClass(state)}
           />
-          <FinalCard label="Loyalty" value={final.loyalty} accent="" />
-          <FinalCard label="Safety" value={final.safety} accent="" />
-          <FinalCard label="Score" value={final.score} accent="border-amber-500/30" />
+          <FinalCard label="Loyalty" value={loyalty} accent="" />
+          <FinalCard label="Safety" value={safety} accent="" />
+          <FinalCard label="Score" value={final_score} accent="border-amber-500/30" />
         </div>
+        <p className="text-xs text-slate-500">Длительность: {duration_sec} сек</p>
       </section>
 
-      {/* Разбор очков */}
-      <section className="card space-y-3">
-        <h2 className="text-sm font-medium uppercase tracking-wide text-slate-400">
-          Разбор очков
-        </h2>
-        <ScoreBreakdown
-          base={score_breakdown.base}
-          speed_bonus={score_breakdown.speed_bonus}
-          completion_bonus={score_breakdown.completion_bonus}
-          penalty={score_breakdown.penalty}
-        />
-      </section>
-
-      {/* Критические решения */}
-      <section className="card space-y-3">
-        <h2 className="text-sm font-medium uppercase tracking-wide text-slate-400">
-          Критические решения
-        </h2>
-        {critical_decisions.length === 0 ? (
-          <p className="text-sm text-slate-500">Таймерных узлов не было</p>
-        ) : (
-          <ul className="divide-y divide-slate-800">
-            {critical_decisions.map((d, i) => (
-              <li
-                key={`${d.node_key}-${d.choice_key}-${i}`}
-                className="flex flex-wrap items-center justify-between gap-2 py-3 text-sm"
-              >
-                <div>
-                  <span className="text-slate-200">{d.node_key}</span>
-                  <span className="ml-2 text-slate-500">→ {d.choice_key}</span>
+      {/* Компетенции */}
+      {competency_progress.length > 0 && (
+        <section className="card space-y-3">
+          <h2 className="text-sm font-medium uppercase tracking-wide text-slate-400">
+            Компетенции
+          </h2>
+          <div className="grid gap-3 sm:grid-cols-2">
+            {competency_progress.map((cp) => (
+              <div key={cp.code} className="text-sm">
+                <div className="flex justify-between">
+                  <span className="text-slate-300">{cp.title}</span>
+                  <span className="tabular-nums text-amber-300">{cp.delta > 0 ? `+${cp.delta}` : cp.delta}</span>
                 </div>
-                <div className="flex items-center gap-2 text-xs">
-                  <span className="tabular-nums text-slate-400">
-                    осталось {d.time_left_sec} с
-                  </span>
-                  {d.was_timeout ? (
-                    <span className="rounded bg-rose-500/20 px-2 py-0.5 text-rose-300">
-                      timeout
-                    </span>
-                  ) : (
-                    <span className="rounded bg-emerald-500/20 px-2 py-0.5 text-emerald-300">
-                      вовремя
-                    </span>
-                  )}
-                </div>
-              </li>
+              </div>
             ))}
-          </ul>
-        )}
-      </section>
-
-      {/* Ошибки */}
-      <section className="card space-y-3">
-        <h2 className="text-sm font-medium uppercase tracking-wide text-slate-400">
-          Что было лучше
-        </h2>
-        {mistakes.length === 0 ? (
-          <p className="text-sm text-slate-500">Критических ошибок не найдено</p>
-        ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full min-w-[28rem] text-left text-sm">
-              <thead className="text-xs uppercase text-slate-500">
-                <tr>
-                  <th className="pb-2 pr-3 font-medium">Узел</th>
-                  <th className="pb-2 pr-3 font-medium">Ваш выбор</th>
-                  <th className="pb-2 font-medium">Рекомендуется</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-800">
-                {mistakes.map((m, i) => (
-                  <tr key={`${m.node_key}-${i}`}>
-                    <td className="py-2 pr-3 text-slate-300">{m.node_key}</td>
-                    <td className="py-2 pr-3 text-rose-300/90">{m.choice_key}</td>
-                    <td className="py-2 text-emerald-300/90">{m.recommended_choice_key}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
           </div>
-        )}
-      </section>
+        </section>
+      )}
 
       {/* События */}
       <section className="card space-y-3">
@@ -263,11 +199,10 @@ export function DebriefPage() {
             <ul className="divide-y divide-slate-800">
               {visibleEvents.map((ev, i) => (
                 <EventRow
-                  key={`${ev.node_key}-${ev.created_at}-${i}`}
+                  key={`${ev.node_key}-${ev.created_at ?? ''}-${i}`}
                   node_key={ev.node_key}
-                  choice_key={ev.choice_key}
+                  choice_key={ev.choice_key ?? null}
                   event_type={ev.event_type}
-                  effects={ev.effects}
                   loyalty_after={ev.loyalty_after}
                   safety_after={ev.safety_after}
                   score_delta={ev.score_delta}
@@ -292,11 +227,11 @@ export function DebriefPage() {
         <h2 className="text-sm font-medium uppercase tracking-wide text-slate-400">
           Достижения
         </h2>
-        {unlocked_achievements.length === 0 ? (
+        {achievements_unlocked.length === 0 ? (
           <p className="card text-sm text-slate-500">Новых достижений нет</p>
         ) : (
           <div className="grid gap-3 sm:grid-cols-2">
-            {unlocked_achievements.map((a, i) => (
+            {achievements_unlocked.map((a, i) => (
               <AchievementCard
                 key={a.code}
                 achievement={{ ...a, unlocked: true }}

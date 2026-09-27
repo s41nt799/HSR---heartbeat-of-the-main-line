@@ -6,57 +6,82 @@ export interface UseTimerResult {
 }
 
 /**
- * Таймер только для отображения. Решение о timeout — на сервере.
- * remaining = (deadline - server_now) - (Date.now() - clientReceivedAt)
+ * Таймер от timer_left_sec. Решение о timeout — на сервере.
+ * Отсчёт идёт от timer_left_sec до 0; при достижении 0 вызывается onExpire ровно один раз.
  */
 export function useTimer(
-  deadline: string | null,
-  serverNow: string,
+  timerLeftSec: number | null,
   onExpire: () => void,
 ): UseTimerResult {
-  const clientReceivedAt = useRef(Date.now());
-  const expireCalledRef = useRef(false);
   const onExpireRef = useRef(onExpire);
   onExpireRef.current = onExpire;
+  const expireCalledRef = useRef(false);
+  const intervalRef = useRef<number | null>(null);
 
-  const [now, setNow] = useState(() => Date.now());
+  const [remainingSec, setRemainingSec] = useState<number | null>(timerLeftSec);
+  const startSecRef = useRef<number | null>(null);
+  const startTimeRef = useRef<number | null>(null);
 
-  // Новый узел / новый дедлайн — сбрасываем якорь и guard
+  // Новый узел — сбрасываем якорь и guard
   useEffect(() => {
-    clientReceivedAt.current = Date.now();
-    expireCalledRef.current = false;
-    setNow(Date.now());
-  }, [deadline, serverNow]);
-
-  useEffect(() => {
-    if (!deadline) return;
-    const id = window.setInterval(() => setNow(Date.now()), 100);
-    return () => window.clearInterval(id);
-  }, [deadline]);
-
-  let remaining_sec: number | null = null;
-  let progress: number | null = null;
-
-  if (deadline) {
-    const deadlineMs = Date.parse(deadline);
-    const serverNowMs = Date.parse(serverNow);
-
-    if (!Number.isNaN(deadlineMs) && !Number.isNaN(serverNowMs)) {
-      const totalMs = Math.max(0, deadlineMs - serverNowMs);
-      const remainingMs = totalMs - (now - clientReceivedAt.current);
-      remaining_sec = Math.max(0, remainingMs / 1000);
-      progress = totalMs > 0 ? Math.min(1, Math.max(0, remainingMs / totalMs)) : 0;
+    if (timerLeftSec === null || timerLeftSec <= 0) {
+      setRemainingSec(timerLeftSec);
+      expireCalledRef.current = false;
+      startSecRef.current = null;
+      startTimeRef.current = null;
+      if (intervalRef.current !== null) {
+        window.clearInterval(intervalRef.current);
+        intervalRef.current = null;
+      }
+      return;
     }
-  }
+    startSecRef.current = timerLeftSec;
+    startTimeRef.current = Date.now();
+    setRemainingSec(timerLeftSec);
+    expireCalledRef.current = false;
+  }, [timerLeftSec]);
+
+  // Тик таймера
+  useEffect(() => {
+    if (startSecRef.current === null || startTimeRef.current === null) return;
+    if (remainingSec === null || remainingSec <= 0) {
+      if (intervalRef.current !== null) {
+        window.clearInterval(intervalRef.current);
+        intervalRef.current = null;
+      }
+      return;
+    }
+
+    intervalRef.current = window.setInterval(() => {
+      const elapsed = (Date.now() - startTimeRef.current!) / 1000;
+      const left = Math.max(0, startSecRef.current! - elapsed);
+      setRemainingSec(left);
+      if (left <= 0 && intervalRef.current !== null) {
+        window.clearInterval(intervalRef.current);
+        intervalRef.current = null;
+      }
+    }, 100);
+
+    return () => {
+      if (intervalRef.current !== null) {
+        window.clearInterval(intervalRef.current);
+        intervalRef.current = null;
+      }
+    };
+  }, [timerLeftSec]);
 
   // onExpire ровно один раз
   useEffect(() => {
-    if (remaining_sec === null) return;
-    if (remaining_sec > 0) return;
+    if (remainingSec === null || remainingSec > 0) return;
     if (expireCalledRef.current) return;
     expireCalledRef.current = true;
     onExpireRef.current();
-  }, [remaining_sec]);
+  }, [remainingSec]);
 
-  return { remaining_sec, progress };
+  const progress =
+    startSecRef.current !== null && startSecRef.current > 0
+      ? Math.max(0, Math.min(1, (remainingSec ?? 0) / startSecRef.current))
+      : null;
+
+  return { remaining_sec: remainingSec, progress };
 }

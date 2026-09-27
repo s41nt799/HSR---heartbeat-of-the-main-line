@@ -6,6 +6,7 @@ import type {
   ChoiceResultResponse, ChoiceRequest,
   SessionDebriefResponse,
   ProfileResponse,
+  SessionHistoryResponse,
 } from '../types/api';
 
 export const authApi = {
@@ -29,12 +30,12 @@ export const authApi = {
 
 export const scenariosApi = {
   list: (params?: { limit?: number; offset?: number }) =>
-    apiClient.get<ScenariosResponse>('/scenarios/', { params }).then(r => r.data),
+    apiClient.get<ScenariosResponse>('/scenarios', { params }).then(r => r.data),
 };
 
 export const sessionsApi = {
-  create: (scenario_id: string) =>
-    apiClient.post<SessionResponse>('/sessions/start', { scenario_id }).then(r => r.data),
+  create: (scenarioId: string) =>
+    apiClient.post<SessionResponse>('/sessions/start', { scenario_id: scenarioId }).then(r => r.data),
 
   getNode: (sessionId: string) =>
     apiClient.get<NodeResponse>(`/sessions/${sessionId}/node`).then(r => r.data),
@@ -54,4 +55,6 @@ export const sessionsApi = {
 
 export const profileApi = {
   get: () => apiClient.get<ProfileResponse>('/profile/me').then(r => r.data),
+  getSessions: (limit?: number, offset?: number) =>
+    apiClient.get<SessionHistoryResponse>(`/profile/me/sessions`, { params: { limit, offset } }).then(r => r.data),
 };

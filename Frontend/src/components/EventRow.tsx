@@ -1,16 +1,13 @@
-import type { EventType } from '../types/api';
-
 interface EventRowProps {
   node_key: string;
   choice_key: string | null;
-  event_type: EventType;
-  effects: { loyalty: number; safety: number; points: number };
+  event_type: 'choice' | 'timeout' | 'finish' | 'fail';
   loyalty_after: number;
   safety_after: number;
   score_delta: number;
 }
 
-const badgeClass: Record<EventType, string> = {
+const badgeClass: Record<EventRowProps['event_type'], string> = {
   choice: 'bg-indigo-500/20 text-indigo-300',
   timeout: 'bg-amber-500/20 text-amber-300',
   finish: 'bg-emerald-500/20 text-emerald-300',
@@ -25,7 +22,6 @@ export function EventRow({
   node_key,
   choice_key,
   event_type,
-  effects,
   loyalty_after,
   safety_after,
   score_delta,
@@ -40,17 +36,12 @@ export function EventRow({
         {choice_key && <span className="text-slate-500">→ {choice_key}</span>}
       </div>
       <div className="mt-1 flex flex-wrap gap-3 text-xs text-slate-400">
-        <span className={effects.loyalty >= 0 ? 'text-emerald-400/90' : 'text-rose-400/90'}>
-          ΔL {signed(effects.loyalty)}
+        <span className={loyalty_after >= 0 ? 'text-emerald-400/90' : 'text-rose-400/90'}>
+          L {signed(loyalty_after)}
         </span>
-        <span className={effects.safety >= 0 ? 'text-emerald-400/90' : 'text-rose-400/90'}>
-          ΔS {signed(effects.safety)}
+        <span className={safety_after >= 0 ? 'text-emerald-400/90' : 'text-rose-400/90'}>
+          S {signed(safety_after)}
         </span>
-        <span className={effects.points >= 0 ? 'text-emerald-400/90' : 'text-rose-400/90'}>
-          ΔP {signed(effects.points)}
-        </span>
-        <span>L→{loyalty_after}</span>
-        <span>S→{safety_after}</span>
         <span className={score_delta >= 0 ? 'text-emerald-400' : 'text-rose-400'}>
           score {signed(score_delta)}
         </span>

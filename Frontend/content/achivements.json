@@ -7,6 +7,6 @@
   { "code": "conflict_solver", "title": "Мастер конфликтов", "description": "Конфликт пассажира с лояльностью ≥ 85", "condition_code": "conflict_85", "icon": "🤝", "sort_order": 6 },
   { "code": "crisis_master", "title": "Медик-проводник", "description": "Медицинский инцидент: безопасность ≥ 80, лояльность ≥ 60", "condition_code": "medical_80_60", "icon": "🩺", "sort_order": 7 },
   { "code": "comeback", "title": "Возвращение в строй", "description": "Завершить сессию после падения любой шкалы ≤ 20", "condition_code": "comeback", "icon": "🔥", "sort_order": 8 },
-  { "code": "top_10", "title": "Входит в топ-10", "description": "Попасть в первые 10 глобального рейтинга", "condition_code": "top10", "icon": "🏆", "sort_order": 9 },
+  { "code": "top_10", "title": "Входит в топ-10", "description": "Попасть в первые 10 всероссийского рейтинга", "condition_code": "top10", "icon": "🏆", "sort_order": 9 },
   { "code": "stable_shift", "title": "Стабильная смена", "description": "3 успешные сессии за календарный день (UTC)", "condition_code": "stable_3", "icon": "📅", "sort_order": 10 }
 ]

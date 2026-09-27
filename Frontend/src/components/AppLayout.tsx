@@ -32,9 +32,6 @@ export function AppLayout() {
             <NavLink to="/profile" className={linkClass}>
               Профиль
             </NavLink>
-            <NavLink to="/leaderboard" className={linkClass}>
-              Лидерборд
-            </NavLink>
             {user && (
               <LevelBadge level={user.level} score={user.total_score} />
             )}

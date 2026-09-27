@@ -9,7 +9,7 @@ export function clampPercent(value: number, max = 100): number {
   return Math.max(0, Math.min(max, value));
 }
 
-export function difficultyLabel(difficulty: string): string {
+export function difficultyLabel(difficulty: string | null | undefined): string {
   const map: Record<string, string> = {
     easy: 'Лёгкий',
     medium: 'Средний',
@@ -18,6 +18,7 @@ export function difficultyLabel(difficulty: string): string {
     Medium: 'Средний',
     Hard: 'Сложный',
   };
+  if (!difficulty) return '—';
   return map[difficulty] ?? difficulty;
 }
 

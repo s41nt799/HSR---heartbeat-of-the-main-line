@@ -87,12 +87,12 @@ export function PlayPage() {
       setSafety((v) => clamp(v + result.safety_delta, 0, 100));
       setScore((v) => Math.max(0, v + result.score_delta));
 
-      if (result.new_state !== 'active' || result.finished) {
+      if (result.new_state !== 'active') {
         goDebrief();
         return;
       }
       // если сервер не применил (например, дедлайн ещё не прошёл) — разрешаем повтор
-      if (!result.finished && result.new_state === 'active') {
+      if (result.new_state === 'active') {
         // refetch вернёт актуальный узел
         void refetch();
       }
@@ -111,7 +111,6 @@ export function PlayPage() {
 
   const { remaining_sec, progress } = useTimer(
     showTimer ? node!.timer_left_sec : null,
-    showTimer ? node!.timer_sec : null,
     handleTimeout,
   );
 
@@ -126,7 +125,7 @@ export function PlayPage() {
       setSafety((v) => clamp(v + result.safety_delta, 0, 100));
       setScore((v) => Math.max(0, v + result.score_delta));
 
-      if (result.new_state !== 'active' || result.finished) {
+      if (result.new_state !== 'active') {
         if (result.new_state === 'failed') {
           show('Сессия провалена: одна из шкал обнулилась', 'error');
         }

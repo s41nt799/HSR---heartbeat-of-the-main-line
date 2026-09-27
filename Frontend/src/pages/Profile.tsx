@@ -143,17 +143,9 @@ export function ProfilePage() {
       </section>
 
       <section className="space-y-3">
-        <div className="flex items-center justify-between gap-3">
-          <h2 className="text-sm font-medium uppercase tracking-wide text-slate-400">
-            Достижения
-          </h2>
-          <Link
-            to="/profile/achievements"
-            className="text-sm text-indigo-400 hover:text-indigo-300"
-          >
-            Все ачивки
-          </Link>
-        </div>
+        <h2 className="text-sm font-medium uppercase tracking-wide text-slate-400">
+          Достижения
+        </h2>
         {achievements_preview.length === 0 ? (
           <EmptyState
             title="Пока нет достижений"
