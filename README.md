@@ -75,9 +75,11 @@ Password: demo1234
 ```bash
 # миграции
 docker compose exec backend alembic upgrade head
-
-# сиды (демо-юзер, 2 сценария, 10 ачивок, лидерборд)
-docker compose exec backend python seed.py
+```
+Запуск сидов (демо-юзер, 2 сценария, 10 ачивок, лидерборд)
+```
+cd backend 
+python seed.py
 ```
 Переменные окружения
 Backend — .env в корне
