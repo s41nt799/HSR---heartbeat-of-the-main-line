@@ -1,4 +1,65 @@
-// ─── Auth ──────────────────────────────────────────
+// ─── Errors ────────────────────────────────────
+export interface ApiErrorBody {
+  detail?: string | Array<{ msg: string }>;
+  message?: string;
+}
+
+// ─── Events ─────────────────────────────────────
+export type EventType = 'choice' | 'timeout' | 'finish' | 'fail';
+
+export interface Effects {
+  loyalty: number;
+  safety: number;
+  points: number;
+}
+
+// ─── Achievements ───────────────────────────────
+export interface Achievement {
+  code: string;
+  title: string;
+  description: string;
+  unlocked: boolean;
+  unlocked_at?: string | null;
+  icon?: string | null;
+}
+
+export type SessionState = 'active' | 'completed' | 'failed' | 'expired';
+
+// ─── Profile (доп. поля) ───────────────────────
+export interface ProfileStats {
+  sessions_completed: number;
+  sessions_failed: number;
+  avg_score: number;
+  best_score: number;
+}
+
+export interface RecentSession {
+  session_id: string;
+  scenario_title: string;
+  finished_at: string;
+  state: string;
+  score: number;
+}
+
+export interface ProfileAchievementsPreview {
+  code: string;
+  title: string;
+  description: string;
+  unlocked: boolean;
+}
+
+export interface SessionHistoryResponse {
+  sessions: Array<{
+    session_id: string;
+    scenario_title: string;
+    finished_at: string;
+    state: string;
+    score: number;
+  }>;
+  total: number;
+}
+
+// ─── Sessions ──────────────────────────────────
 export interface UserMe {
   id: string;
   email: string;
@@ -118,4 +179,7 @@ export interface ProfileResponse {
   sessions_failed: number;
   average_score: number;
   top_competencies: Array<{ code: string; title: string; score: number; progress_percent: number }>;
+  stats: ProfileStats;
+  recent_sessions: RecentSession[];
+  achievements_preview: ProfileAchievementsPreview[];
 }
