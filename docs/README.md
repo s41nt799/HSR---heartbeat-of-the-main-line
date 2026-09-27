@@ -36,8 +36,7 @@
 DATABASE_URL=postgresql+asyncpg://user:password@localhost:5432/gamification
 SECRET_KEY=your-secret-key
 ALGORITHM=HS256
-ACCESS_TOKEN_EXPIRE_MINUTES=30
-REFRESH_TOKEN_EXPIRE_DAYS=7
+ACCESS_TOKEN_TTL_MINUTES=30
 ```
 
 ### Запуск через Docker
