@@ -42,7 +42,6 @@ async def get_user_profile(db: AsyncSession, user_id: uuid.UUID) -> ProfileRespo
                     PlaySessionStates.COMPLETED,
                     PlaySessionStates.FAILED,
                     PlaySessionStates.EXPIRED,
-                    PlaySessionStates.ABANDONED,
                 ]),
             )
         )

@@ -129,7 +129,7 @@ async def get_progress_history(db: AsyncSession, user_id: uuid.UUID) -> HistoryR
                     PlaySessionStates.COMPLETED,
                     PlaySessionStates.FAILED,
                     PlaySessionStates.EXPIRED,
-                    PlaySessionStates.ABANDONED,
+
                 ]),
             )
             .order_by(PlaySession.finished_at.desc())

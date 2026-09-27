@@ -24,7 +24,6 @@ async def get_leaderboard(db: AsyncSession, user_id: uuid.UUID, limit: int) -> L
                         PlaySessionStates.COMPLETED,
                         PlaySessionStates.FAILED,
                         PlaySessionStates.EXPIRED,
-                        PlaySessionStates.ABANDONED,
                     ]),
                 )
             )
@@ -41,7 +40,19 @@ async def get_leaderboard(db: AsyncSession, user_id: uuid.UUID, limit: int) -> L
             )
         )
 
-    current_user = (await db.execute(select(User).where(User.id == user_id))).scalar_one_or_none()
+    current_user_query = await db.execute(
+            select(User).where(User.id == user_id)
+        )
+    current_user = current_user_query.scalar_one_or_none()
+    if current_user is None:
+        current_user_position = None
+    else:
+        users_above_query = await db.execute(
+            select(func.count(User.id))
+            .where(User.total_score > current_user.total_score)
+        )
+        users_above = users_above_query.scalar_one()
+        current_user_position = users_above + 1
 
     current_user_position = None
     if current_user is not None:
