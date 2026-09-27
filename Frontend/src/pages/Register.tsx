@@ -1,6 +1,7 @@
 import { useState, type FormEvent } from 'react';
 import { Link, Navigate, useNavigate } from 'react-router-dom';
-import { getErrorMessage, useAuth } from '../hooks/useAuth';
+import { useAuth } from '../hooks/useAuth';
+import { getErrorMessage } from '../api/client';
 import { isValidEmail } from '../utils/format';
 
 export function RegisterPage() {
@@ -35,7 +36,7 @@ export function RegisterPage() {
 
     setSubmitting(true);
     try {
-      await register(email.trim(), password, displayName.trim());
+      await register({ email: email.trim(), password, display_name: displayName.trim() });
       navigate('/scenarios', { replace: true });
     } catch (err) {
       setError(getErrorMessage(err, 'Не удалось зарегистрироваться'));
