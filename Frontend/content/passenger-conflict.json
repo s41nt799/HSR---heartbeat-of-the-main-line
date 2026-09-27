@@ -1,0 +1,128 @@
+{
+  "scenario_id": "passenger-conflict",
+  "title": "Конфликт пассажира",
+  "description": "Недовольный пассажир в вагоне ВСМ — от спокойного диалога до эскалации",
+  "version": 1,
+  "difficulty": "medium",
+  "is_active": true,
+  "start_node_key": "start",
+  "recommendations": [
+    "Сначала уточните потребность пассажира, потом предлагайте решение",
+    "На критическом узле успейте выбрать до 70% времени — сохранится бонус за скорость"
+  ],
+  "nodes": [
+    {
+      "node_key": "start",
+      "type": "start",
+      "text": "Пассажир в вагоне недоволен своим местом и требует пересадить его в другой вагон. Говорит громко, окружающие оборачиваются.",
+      "timer_sec": null,
+      "choices": [
+        {
+          "choice_key": "calm",
+          "text": "Спокойно уточнить, что именно не устраивает",
+          "effects": { "loyalty": 8, "safety": 0, "points": 15 },
+          "next_node_key": "dialogue_2",
+          "is_visible": true
+        },
+        {
+          "choice_key": "ignore",
+          "text": "Сослаться на занятость и уйти",
+          "effects": { "loyalty": -20, "safety": -10, "points": -15 },
+          "next_node_key": "end_fail",
+          "is_visible": true
+        },
+        {
+          "choice_key": "blame",
+          "text": "Указать, что он сам виноват в выборе места",
+          "effects": { "loyalty": -25, "safety": -5, "points": -20 },
+          "next_node_key": "critical_1",
+          "is_visible": true
+        }
+      ]
+    },
+    {
+      "node_key": "dialogue_2",
+      "type": "dialogue",
+      "text": "Пассажир объясняет: место у туалета, шумно, он не выспался перед встречей. Просит помочь.",
+      "timer_sec": null,
+      "choices": [
+        {
+          "choice_key": "find_seat",
+          "text": "Найти свободное место в другом вагоне",
+          "effects": { "loyalty": 15, "safety": 5, "points": 25 },
+          "next_node_key": "critical_1",
+          "is_visible": true
+        },
+        {
+          "choice_key": "offer_comp",
+          "text": "Предложить компенсацию — чай, плед",
+          "effects": { "loyalty": 10, "safety": 0, "points": 15 },
+          "next_node_key": "critical_1",
+          "is_visible": true
+        },
+        {
+          "choice_key": "refuse",
+          "text": "Отказать: мест больше нет",
+          "effects": { "loyalty": -15, "safety": 0, "points": -10 },
+          "next_node_key": "critical_1",
+          "is_visible": true
+        }
+      ]
+    },
+    {
+      "node_key": "critical_1",
+      "type": "critical",
+      "text": "Пассажир повышает голос, требует жалобную книгу. Другие пассажиры начинают снимать на телефон.",
+      "timer_sec": 12,
+      "choices": [
+        {
+          "choice_key": "apologize",
+          "text": "Извиниться и предложить конкретное решение",
+          "effects": { "loyalty": 20, "safety": 10, "points": 30 },
+          "next_node_key": "end_success",
+          "is_visible": true
+        },
+        {
+          "choice_key": "call_sec",
+          "text": "Вызвать охрану состава",
+          "effects": { "loyalty": -10, "safety": 15, "points": 5 },
+          "next_node_key": "end_fail",
+          "is_visible": true
+        },
+        {
+          "choice_key": "give_book",
+          "text": "Молча выдать жалобную книгу",
+          "effects": { "loyalty": -5, "safety": -5, "points": 0 },
+          "next_node_key": "end_fail",
+          "is_visible": true
+        },
+        {
+          "choice_key": "timeout",
+          "text": "",
+          "effects": { "loyalty": -10, "safety": -15, "points": -20 },
+          "next_node_key": "end_fail",
+          "is_visible": false
+        }
+      ]
+    },
+    {
+      "node_key": "end_success",
+      "type": "ending_success",
+      "text": "Пассажир успокоился, извинился за резкость. Атмосфера в вагоне нормализовалась, никто не снимает.",
+      "timer_sec": null,
+      "choices": []
+    },
+    {
+      "node_key": "end_fail",
+      "type": "ending_fail",
+      "text": "Конфликт эскалировал. Жалоба ушла в компанию, видео попало в соцсети.",
+      "timer_sec": null,
+      "choices": []
+    }
+  ],
+  "debrief_hints": {
+    "start": "Уточните потребность, прежде чем предлагать решение",
+    "dialogue_2": "Конкретная помощь работает лучше компенсации",
+    "critical_1": "Извинение и конкретика снижают напряжение, вызов охраны — эскалация"
+  }
+}

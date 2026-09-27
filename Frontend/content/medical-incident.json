@@ -1,0 +1,128 @@
+{
+  "scenario_id": "medical-incident",
+  "title": "Медицинский инцидент",
+  "description": "Пассажиру стало плохо в пути — от первичной оценки до реанимации",
+  "version": 1,
+  "difficulty": "hard",
+  "is_active": true,
+  "start_node_key": "start",
+  "recommendations": [
+    "При потере сознания — сначала протокол ABC (дыхание, пульс), потом всё остальное",
+    "Не оставляйте пассажира одного до прибытия медиков"
+  ],
+  "nodes": [
+    {
+      "node_key": "start",
+      "type": "start",
+      "text": "В вагоне пассажирке стало плохо: бледность, головокружение, держится за поручень.",
+      "timer_sec": null,
+      "choices": [
+        {
+          "choice_key": "assess",
+          "text": "Оценить состояние: пульс, дыхание, сознание",
+          "effects": { "loyalty": 10, "safety": 15, "points": 20 },
+          "next_node_key": "dialogue_2",
+          "is_visible": true
+        },
+        {
+          "choice_key": "water",
+          "text": "Дать воды и посадить",
+          "effects": { "loyalty": 5, "safety": -5, "points": 5 },
+          "next_node_key": "dialogue_2",
+          "is_visible": true
+        },
+        {
+          "choice_key": "ignore",
+          "text": "Решить, что пройдёт само",
+          "effects": { "loyalty": -15, "safety": -25, "points": -20 },
+          "next_node_key": "end_fail",
+          "is_visible": true
+        }
+      ]
+    },
+    {
+      "node_key": "dialogue_2",
+      "type": "dialogue",
+      "text": "Пассажирка жалуется на боль в груди, говорит, что задыхается. Рядом — её муж, в панике.",
+      "timer_sec": null,
+      "choices": [
+        {
+          "choice_key": "call_medic",
+          "text": "Вызвать медиков и сообщить машинисту",
+          "effects": { "loyalty": 15, "safety": 20, "points": 25 },
+          "next_node_key": "critical_1",
+          "is_visible": true
+        },
+        {
+          "choice_key": "reassure",
+          "text": "Успокоить, дать таблетку из аптечки",
+          "effects": { "loyalty": 5, "safety": -10, "points": -5 },
+          "next_node_key": "critical_1",
+          "is_visible": true
+        },
+        {
+          "choice_key": "husband",
+          "text": "Попросить мужа самому разобраться",
+          "effects": { "loyalty": -10, "safety": -15, "points": -15 },
+          "next_node_key": "critical_1",
+          "is_visible": true
+        }
+      ]
+    },
+    {
+      "node_key": "critical_1",
+      "type": "critical",
+      "text": "Пассажирка теряет сознание. Пульс слабый, дыхание поверхностное. Решение за секунды.",
+      "timer_sec": 10,
+      "choices": [
+        {
+          "choice_key": "cpr",
+          "text": "Уложить, начать реанимационные действия",
+          "effects": { "loyalty": 20, "safety": 30, "points": 35 },
+          "next_node_key": "end_success",
+          "is_visible": true
+        },
+        {
+          "choice_key": "wait",
+          "text": "Ждать бригаду медиков",
+          "effects": { "loyalty": -10, "safety": -20, "points": -15 },
+          "next_node_key": "end_fail",
+          "is_visible": true
+        },
+        {
+          "choice_key": "sit",
+          "text": "Посадить и дать воды",
+          "effects": { "loyalty": -5, "safety": -25, "points": -10 },
+          "next_node_key": "end_fail",
+          "is_visible": true
+        },
+        {
+          "choice_key": "timeout",
+          "text": "",
+          "effects": { "loyalty": -10, "safety": -15, "points": -20 },
+          "next_node_key": "end_fail",
+          "is_visible": false
+        }
+      ]
+    },
+    {
+      "node_key": "end_success",
+      "type": "ending_success",
+      "text": "Медики стабилизировали пассажирку. Муж благодарит, ситуация под контролем.",
+      "timer_sec": null,
+      "choices": []
+    },
+    {
+      "node_key": "end_fail",
+      "type": "ending_fail",
+      "text": "Состояние ухудшилось. Пассажирку госпитализировали в тяжёлом состоянии.",
+      "timer_sec": null,
+      "choices": []
+    }
+  ],
+  "debrief_hints": {
+    "start": "Оценка ABC — базовый протокол при любом инциденте",
+    "dialogue_2": "Боль в груди + одышка — повод немедленно звать медиков",
+    "critical_1": "Потеря сознания с слабым пульсом — начало реанимации до приезда медиков"
+  }
+}
