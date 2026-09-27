@@ -7,112 +7,125 @@ import {
   useState,
   type ReactNode,
 } from 'react';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { authApi, scenariosApi } from '../api';
+import { useQueryClient } from '@tanstack/react-query';
+import { authApi } from '../api';
 import {
   clearStoredToken,
-  getErrorMessage,
   getStoredToken,
   setStoredToken,
   setUnauthorizedHandler,
 } from '../api/client';
-import type { UserMe } from '../types/api';
+import type { AuthRegisterRequest, UserMe } from '../types/api';
 
+// ─── Types ─────────────────────────────────────────
 interface AuthContextValue {
-  token: string | null;
   user: UserMe | null;
-  isLoading: boolean;
   isAuthenticated: boolean;
+  isLoading: boolean;
   login: (email: string, password: string) => Promise<void>;
-  register: (email: string, password: string, displayName: string) => Promise<void>;
+  register: (body: AuthRegisterRequest) => Promise<void>;
   logout: () => void;
 }
 
 const AuthContext = createContext<AuthContextValue | null>(null);
 
+// ─── Provider ──────────────────────────────────────
 export function AuthProvider({ children }: { children: ReactNode }) {
   const queryClient = useQueryClient();
-  const [token, setToken] = useState<string | null>(() => getStoredToken());
+  const [user, setUser] = useState<UserMe | null>(null);
+  const [isLoading, setIsLoading] = useState<boolean>(() => !!getStoredToken());
 
-  const meQuery = useQuery({
-    queryKey: ['me'],
-    queryFn: authApi.me,
-    enabled: Boolean(token),
-    retry: false,
-    staleTime: 30_000,
-  });
-
+  // ─── Logout ──────────────────────────────────────
   const logout = useCallback(() => {
     clearStoredToken();
-    setToken(null);
+    setUser(null);
     queryClient.clear();
   }, [queryClient]);
 
+  // ─── Регистрируем обработчик 401 из client.ts ────
   useEffect(() => {
     setUnauthorizedHandler(() => {
-      logout();
-      // Редирект на /login при 401 (вне React Router tree interceptor)
-      if (window.location.pathname !== '/login' && window.location.pathname !== '/register') {
-        window.location.assign('/login');
-      }
+      clearStoredToken();
+      setUser(null);
+      queryClient.clear();
     });
     return () => setUnauthorizedHandler(null);
-  }, [logout]);
+  }, [queryClient]);
 
+  // ─── Восстановление сессии при загрузке ──────────
+  useEffect(() => {
+    const token = getStoredToken();
+    if (!token) {
+      setIsLoading(false);
+      return;
+    }
+
+    let cancelled = false;
+    authApi
+      .me()
+      .then((data) => {
+        if (!cancelled) setUser(data as UserMe);
+      })
+      .catch(() => {
+        if (!cancelled) {
+          clearStoredToken();
+          setUser(null);
+        }
+      })
+      .finally(() => {
+        if (!cancelled) setIsLoading(false);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  // ─── Login ───────────────────────────────────────
   const login = useCallback(
     async (email: string, password: string) => {
-      const data = await authApi.login({ email, password });
+      const data = await authApi.login(email, password);
       setStoredToken(data.access_token);
-      setToken(data.access_token);
-      await queryClient.prefetchQuery({
-        queryKey: ['scenarios'],
-        queryFn: () => scenariosApi.list({ limit: 20, offset: 0 }),
-      });
-      await queryClient.invalidateQueries({ queryKey: ['me'] });
+      setUser(data.user);
     },
-    [queryClient],
+    [],
   );
 
+  // ─── Register ────────────────────────────────────
   const register = useCallback(
-    async (email: string, password: string, displayName: string) => {
-      const data = await authApi.register({
-        email,
-        password,
-        display_name: displayName,
-      });
+    async (body: AuthRegisterRequest) => {
+      // доп. проверка на всякий случай (основная — в форме)
+      if (body.password.length < 8) {
+        throw new Error('Пароль должен быть минимум 8 символов');
+      }
+      const data = await authApi.register(body);
       setStoredToken(data.access_token);
-      setToken(data.access_token);
-      await queryClient.prefetchQuery({
-        queryKey: ['scenarios'],
-        queryFn: () => scenariosApi.list({ limit: 20, offset: 0 }),
-      });
-      await queryClient.invalidateQueries({ queryKey: ['me'] });
+      setUser(data.user);
     },
-    [queryClient],
+    [],
   );
 
+  // ─── Value ───────────────────────────────────────
   const value = useMemo<AuthContextValue>(
     () => ({
-      token,
-      user: meQuery.data ?? null,
-      isLoading: Boolean(token) && meQuery.isLoading,
-      isAuthenticated: Boolean(token),
+      user,
+      isAuthenticated: !!user,
+      isLoading,
       login,
       register,
       logout,
     }),
-    [token, meQuery.data, meQuery.isLoading, login, register, logout],
+    [user, isLoading, login, register, logout],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
 
+// ─── Hook ──────────────────────────────────────────
 export function useAuth(): AuthContextValue {
   const ctx = useContext(AuthContext);
   if (!ctx) {
-    throw new Error('useAuth must be used within AuthProvider');
+    throw new Error('useAuth must be used within <AuthProvider>');
   }
   return ctx;
 }
-
-export { getErrorMessage };

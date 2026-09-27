@@ -1,6 +1,9 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { sessionsApi } from '../api';
-import type { ChoiceResponse, FinishResponse, TimeoutResponse } from '../types/api';
+import type {
+  ChoiceResultResponse,
+  SessionResponse,
+} from '../types/api';
 
 export function useSession(sessionId: string | undefined) {
   const queryClient = useQueryClient();
@@ -21,7 +24,7 @@ export function useSession(sessionId: string | undefined) {
 
   const choiceMutation = useMutation({
     mutationFn: (choiceKey: string) =>
-      sessionsApi.postChoice(sessionId!, { choice_key: choiceKey }),
+      sessionsApi.postChoice(sessionId!, { choice_key: choiceKey, version: 0 }),
     onSuccess: () => {
       invalidateNode();
     },
@@ -47,11 +50,13 @@ export function useSession(sessionId: string | undefined) {
     isFetching: nodeQuery.isFetching,
     error: nodeQuery.error,
     refetch: nodeQuery.refetch,
-    makeChoice: choiceMutation.mutateAsync as (choiceKey: string) => Promise<ChoiceResponse>,
+    makeChoice: choiceMutation.mutateAsync as (
+      choiceKey: string,
+    ) => Promise<ChoiceResultResponse>,
     isChoosing: choiceMutation.isPending,
-    triggerTimeout: timeoutMutation.mutateAsync as () => Promise<TimeoutResponse>,
+    triggerTimeout: timeoutMutation.mutateAsync as () => Promise<ChoiceResultResponse>,
     isTimingOut: timeoutMutation.isPending,
-    finish: finishMutation.mutateAsync as () => Promise<FinishResponse>,
+    finish: finishMutation.mutateAsync as () => Promise<SessionResponse>,
     isFinishing: finishMutation.isPending,
   };
 }

@@ -19,6 +19,7 @@ function NodeViewComponent({
   finishDisabled = false,
 }: NodeViewProps) {
   const isEnding = node.type === 'ending_success' || node.type === 'ending_fail';
+  const visibleChoices = (node.choices ?? []).filter((c) => c.is_visible !== false);
 
   return (
     <div className="space-y-6 animate-[fadeIn_150ms_ease-out]">
@@ -44,14 +45,14 @@ function NodeViewComponent({
         </button>
       ) : (
         <div className="flex flex-col gap-2">
-          {node.choices.length === 0 ? (
+          {visibleChoices.length === 0 ? (
             <p className="text-sm text-slate-400">Нет доступных выборов</p>
           ) : (
-            node.choices.map((choice) => (
+            visibleChoices.map((choice) => (
               <ChoiceButton
                 key={choice.choice_key}
                 choice_key={choice.choice_key}
-                text={choice.text}
+                text={choice.choice_text}
                 onClick={onChoice}
                 disabled={choicesDisabled}
               />

@@ -28,8 +28,8 @@ export function RegisterPage() {
       setError('Введите корректный email');
       return;
     }
-    if (password.length < 6) {
-      setError('Пароль должен быть не короче 6 символов');
+    if (password.length < 8) {
+      setError('Пароль должен быть не короче 8 символов');
       return;
     }
 

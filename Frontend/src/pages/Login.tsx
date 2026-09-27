@@ -1,6 +1,7 @@
 import { useState, type FormEvent } from 'react';
 import { Link, Navigate, useNavigate } from 'react-router-dom';
-import { getErrorMessage, useAuth } from '../hooks/useAuth';
+import { useAuth } from '../hooks/useAuth';
+import { getErrorMessage } from '../api/client';
 import { isValidEmail } from '../utils/format';
 
 export function LoginPage() {
@@ -23,8 +24,8 @@ export function LoginPage() {
       setError('Введите корректный email');
       return;
     }
-    if (password.length < 6) {
-      setError('Пароль должен быть не короче 6 символов');
+    if (password.length < 8) {
+      setError('Пароль должен быть не короче 8 символов');
       return;
     }
 

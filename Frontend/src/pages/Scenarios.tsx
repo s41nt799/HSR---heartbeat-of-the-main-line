@@ -20,11 +20,12 @@ export function ScenariosPage() {
   });
 
   const startMutation = useMutation({
-    mutationFn: (scenarioId: string) =>
-      sessionsApi.create({ scenario_id: scenarioId }),
-    onSuccess: (data, scenarioId) => {
-      rememberSessionScenario(data.session_id, scenarioId);
-      navigate(`/sessions/${data.session_id}/play`);
+    mutationFn: (scenarioId: string) => sessionsApi.create(scenarioId),
+    onSuccess: (session, scenarioId) => {
+      rememberSessionScenario(session.session_id, scenarioId);
+      navigate(`/sessions/${session.session_id}/play`, {
+        state: { session },
+      });
     },
     onError: (err) => {
       show(getErrorMessage(err, 'Не удалось начать сессию'), 'error');

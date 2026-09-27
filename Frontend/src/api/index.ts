@@ -1,79 +1,57 @@
 import { apiClient } from './client';
 import type {
-  AchievementsResponse,
-  AuthLoginRequest,
-  AuthLoginResponse,
-  AuthRegisterRequest,
-  AuthRegisterResponse,
-  ChoiceRequest,
-  ChoiceResponse,
-  CreateSessionRequest,
-  CreateSessionResponse,
-  DebriefResponse,
-  FinishResponse,
-  LeaderboardResponse,
-  NodeResponse,
-  ProfileResponse,
+  AuthRegisterRequest, AuthResponse,
   ScenariosResponse,
-  TimeoutResponse,
-  UserMe,
+  SessionResponse, NodeResponse,
+  ChoiceResultResponse, ChoiceRequest,
+  SessionDebriefResponse,
+  ProfileResponse,
 } from '../types/api';
 
 export const authApi = {
   register: (body: AuthRegisterRequest) =>
-    apiClient.post<AuthRegisterResponse>('/auth/register', body).then((r) => r.data),
+    apiClient.post<AuthResponse>('/auth/register', body).then(r => r.data),
 
-  login: (body: AuthLoginRequest) =>
-    apiClient.post<AuthLoginResponse>('/auth/login', body).then((r) => r.data),
+  login: (email: string, password: string) => {
+    const params = new URLSearchParams();
+    params.append('username', email);
+    params.append('password', password);
+    params.append('grant_type', 'password');
+    return apiClient
+      .post<AuthResponse>('/auth/login', params, {
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      })
+      .then(r => r.data);
+  },
 
-  me: () => apiClient.get<UserMe>('/auth/me').then((r) => r.data),
+  me: () => apiClient.get('/auth/me').then(r => r.data),
 };
 
 export const scenariosApi = {
   list: (params?: { limit?: number; offset?: number }) =>
-    apiClient
-      .get<ScenariosResponse>('/scenarios', { params })
-      .then((r) => r.data),
+    apiClient.get<ScenariosResponse>('/scenarios/', { params }).then(r => r.data),
 };
 
 export const sessionsApi = {
-  create: (body: CreateSessionRequest) =>
-    apiClient.post<CreateSessionResponse>('/sessions', body).then((r) => r.data),
+  create: (scenario_id: string) =>
+    apiClient.post<SessionResponse>('/sessions/start', { scenario_id }).then(r => r.data),
 
   getNode: (sessionId: string) =>
-    apiClient.get<NodeResponse>(`/sessions/${sessionId}/node`).then((r) => r.data),
+    apiClient.get<NodeResponse>(`/sessions/${sessionId}/node`).then(r => r.data),
 
   postChoice: (sessionId: string, body: ChoiceRequest) =>
-    apiClient
-      .post<ChoiceResponse>(`/sessions/${sessionId}/choices`, body)
-      .then((r) => r.data),
+    apiClient.post<ChoiceResultResponse>(`/sessions/${sessionId}/choice`, body).then(r => r.data),
 
   postTimeout: (sessionId: string) =>
-    apiClient
-      .post<TimeoutResponse>(`/sessions/${sessionId}/timeout`)
-      .then((r) => r.data),
+    apiClient.post<ChoiceResultResponse>(`/sessions/${sessionId}/timeout`).then(r => r.data),
 
   postFinish: (sessionId: string) =>
-    apiClient
-      .post<FinishResponse>(`/sessions/${sessionId}/finish`)
-      .then((r) => r.data),
+    apiClient.post<SessionResponse>(`/sessions/${sessionId}/finish`).then(r => r.data),
 
   getDebrief: (sessionId: string) =>
-    apiClient
-      .get<DebriefResponse>(`/sessions/${sessionId}/debrief`)
-      .then((r) => r.data),
+    apiClient.get<SessionDebriefResponse>(`/sessions/${sessionId}`).then(r => r.data),
 };
 
 export const profileApi = {
-  get: () => apiClient.get<ProfileResponse>('/profile').then((r) => r.data),
-
-  achievements: () =>
-    apiClient.get<AchievementsResponse>('/profile/achievements').then((r) => r.data),
-};
-
-export const leaderboardApi = {
-  get: (limit = 50) =>
-    apiClient
-      .get<LeaderboardResponse>('/leaderboard', { params: { limit } })
-      .then((r) => r.data),
+  get: () => apiClient.get<ProfileResponse>('/profile/me').then(r => r.data),
 };
