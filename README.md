@@ -187,6 +187,7 @@ Vite проксирует /api/* на http://localhost:8000 — CORS не нуж
 См. ```docs/TEAM.md``` — кто что делал.
 
 Документация
+```text
 Документ	О чём
 ```docs/ARCHITECTURE.md```	Диаграмма компонентов и последовательностей
 ```docs/API.md```	Описание эндпоинтов, примеры запросов
@@ -198,3 +199,4 @@ Vite проксирует /api/* на http://localhost:8000 — CORS не нуж
 ```DEMO_SCRIPT.md```	Легенда показа на 3 минуты
 ```Swagger UI	http://localhost:8000/docs```
 ```ReDoc	http://localhost:8000/redoc```
+```
